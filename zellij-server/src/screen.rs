@@ -3809,6 +3809,7 @@ pub(crate) fn screen_thread_main(
             PluginCapabilities {
                 //  ¯\_(ツ)_/¯
                 arrow_fonts: !arrow_fonts,
+                is_macos: cfg!(target_os = "macos"),
             },
             &config.keybinds,
             config_options.default_mode,

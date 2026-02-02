@@ -624,6 +624,7 @@ impl MockScreen {
         };
         let capabilities = PluginCapabilities {
             arrow_fonts: Default::default(),
+            is_macos: Default::default(),
         };
 
         let layout = Box::new(Layout::default()); // this is not actually correct!!

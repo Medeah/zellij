@@ -1689,6 +1689,7 @@ impl TryFrom<ProtobufModeUpdatePayload> for ModeInfo {
             .map(|w| w.into());
         let capabilities = PluginCapabilities {
             arrow_fonts: protobuf_mode_update_payload.arrow_fonts_support,
+            is_macos: cfg!(target_os = "macos"),
         };
         let currently_marking_pane_group =
             protobuf_mode_update_payload.currently_marking_pane_group;
@@ -2058,7 +2059,7 @@ fn serialize_mode_update_event_with_non_default_values() {
             rounded_corners: true,
             hide_session_name: false,
         },
-        capabilities: PluginCapabilities { arrow_fonts: false },
+        capabilities: PluginCapabilities { arrow_fonts: false, is_macos: false },
         session_name: Some("my awesome test session".to_owned()),
         base_mode: Some(InputMode::Locked),
         editor: Some(PathBuf::from("my_awesome_editor")),

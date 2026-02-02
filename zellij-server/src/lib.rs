@@ -51,8 +51,8 @@ use zellij_utils::{
         DEFAULT_SCROLL_BUFFER_SIZE, SCROLL_BUFFER_SIZE, ZELLIJ_SEEN_RELEASE_NOTES_CACHE_FILE,
     },
     data::{
-        ConnectToSession, Event, InputMode, KeyWithModifier, LayoutInfo, LayoutWithError,
-        PluginCapabilities, Style, WebSharing,
+        terminal_needs_simplified_ui, ConnectToSession, Event, InputMode, KeyWithModifier,
+        LayoutInfo, LayoutWithError, PluginCapabilities, Style, WebSharing,
     },
     errors::{prelude::*, ContextType, ErrorInstruction, FatalError, ServerContext},
     home::{default_layout_dir, get_default_data_dir},
@@ -1695,7 +1695,10 @@ fn init_session(
     let data_dir = cli_assets.data_dir.unwrap_or_else(get_default_data_dir);
 
     let capabilities = PluginCapabilities {
-        arrow_fonts: config_options.simplified_ui.unwrap_or_default(),
+        arrow_fonts: config_options
+            .simplified_ui
+            .unwrap_or_else(terminal_needs_simplified_ui),
+        is_macos: cfg!(target_os = "macos"),
     };
 
     let serialization_interval = config_options.serialization_interval;

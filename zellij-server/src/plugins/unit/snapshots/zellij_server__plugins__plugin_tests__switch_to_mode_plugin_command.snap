@@ -311,6 +311,7 @@ Some(
             },
             capabilities: PluginCapabilities {
                 arrow_fonts: true,
+                is_macos: false,
             },
             session_name: Some(
                 "zellij-test",

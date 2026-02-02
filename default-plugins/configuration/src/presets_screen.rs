@@ -15,6 +15,7 @@ pub struct PresetsScreen {
     primary_modifier: BTreeSet<KeyModifier>,
     secondary_modifier: BTreeSet<KeyModifier>,
     rebind_leaders_screen: Option<RebindLeadersScreen>,
+    applied_os_defaults: bool,
 }
 
 impl Default for PresetsScreen {
@@ -30,6 +31,7 @@ impl Default for PresetsScreen {
             latest_mode_info: None,
             notification: None,
             rebind_leaders_screen: None,
+            applied_os_defaults: false,
         }
     }
 }
@@ -178,7 +180,30 @@ impl PresetsScreen {
         if let Some(rebind_leaders_screen) = self.rebind_leaders_screen.as_mut() {
             rebind_leaders_screen.update_mode_info(mode_info.clone());
         }
+        // On macOS, use Opt (Alt) as primary modifier instead of Ctrl
+        if !self.applied_os_defaults && mode_info.capabilities.is_macos {
+            self.applied_os_defaults = true;
+            self.primary_modifier.clear();
+            self.primary_modifier.insert(KeyModifier::Alt);
+            self.secondary_modifier.clear();
+            self.secondary_modifier.insert(KeyModifier::Ctrl);
+        }
         self.latest_mode_info = Some(mode_info);
+    }
+    fn is_macos(&self) -> bool {
+        self.latest_mode_info
+            .as_ref()
+            .map(|m| m.capabilities.is_macos)
+            .unwrap_or(false)
+    }
+    fn modifier_display(&self, m: &KeyModifier) -> &'static str {
+        match m {
+            KeyModifier::Alt if self.is_macos() => "Opt",
+            KeyModifier::Alt => "Alt",
+            KeyModifier::Ctrl => "Ctrl",
+            KeyModifier::Shift => "Shift",
+            KeyModifier::Super => "Super",
+        }
     }
     pub fn move_selected_index_down(&mut self) {
         if self.selected_index.is_none() {
@@ -324,7 +349,7 @@ impl PresetsScreen {
         } else {
             self.primary_modifier
                 .iter()
-                .map(|m| m.to_string())
+                .map(|m| self.modifier_display(m))
                 .collect::<Vec<_>>()
                 .join("-")
         }
@@ -335,7 +360,7 @@ impl PresetsScreen {
         } else {
             self.secondary_modifier
                 .iter()
-                .map(|m| m.to_string())
+                .map(|m| self.modifier_display(m))
                 .collect::<Vec<_>>()
                 .join("-")
         }

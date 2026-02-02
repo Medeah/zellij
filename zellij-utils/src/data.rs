@@ -2511,12 +2511,23 @@ impl fmt::Display for PluginTag {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub struct PluginCapabilities {
     pub arrow_fonts: bool,
+    pub is_macos: bool,
 }
 
 impl Default for PluginCapabilities {
     fn default() -> PluginCapabilities {
-        PluginCapabilities { arrow_fonts: true }
+        PluginCapabilities {
+            arrow_fonts: true,
+            is_macos: cfg!(target_os = "macos"),
+        }
     }
+}
+
+/// Returns true if terminal likely doesn't support special symbols
+pub fn terminal_needs_simplified_ui() -> bool {
+    std::env::var("TERM")
+        .map(|t| t == "linux" || t == "dumb")
+        .unwrap_or(false)
 }
 
 /// Represents a Clipboard type
